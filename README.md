@@ -23,6 +23,25 @@ Documentación compartida en [docs/contracts.md](docs/contracts.md) (contratos c
 
 Antes de arrancar Auth, crea su base de datos: `CREATE DATABASE biblioteca_auth;`
 
+### Alternativa con Docker (si no tienes la contraseña de tu PostgreSQL local)
+
+Levanta un PostgreSQL dedicado en el puerto **5434** con la base de datos ya creada:
+
+```bash
+docker run -d --name biblioteca-auth-db \
+  -e POSTGRES_PASSWORD=root \
+  -e POSTGRES_DB=biblioteca_auth \
+  -p 5434:5432 postgres:16
+```
+
+Y ajusta `service-auth/.env`:
+
+```env
+DATABASE_URL=postgresql://postgres:root@localhost:5434/biblioteca_auth
+```
+
+> Nota: el contenedor es solo infraestructura local de desarrollo; no forma parte del entregable del Sprint 1 (no se añaden Dockerfile ni docker-compose al repositorio).
+
 ## Instalación
 
 ```bash
