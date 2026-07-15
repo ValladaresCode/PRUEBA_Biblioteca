@@ -1,0 +1,5 @@
+packages:
+  - frontend
+  - service-auth
+  - service-library
+  - service-statistics
