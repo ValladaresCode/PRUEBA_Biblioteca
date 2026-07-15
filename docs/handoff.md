@@ -1,7 +1,8 @@
-Estado y handoff del proyecto
-Última actualización: 2026-07-15
-Responsable de actualización: Scrum Master
-Sprint actual: Sprint 1
+# Actualización de handoff — Inicio del Sprint 2
+
+Última actualización: 15/07/2026-04:22pm
+Responsable: Scrum Master
+Sprint actual: Sprint 2
 
 1. Estado general
 Estado:
@@ -146,3 +147,70 @@ docs/handoff.md
 docs/integration-sprint-1.md
 El código del subproyecto correspondiente
 No asumir que una funcionalidad está terminada si no aparece como completada y probada en este documento.
+
+## Estado del Sprint 1
+
+Estado: CERRADO — APROBADO CON OBSERVACIONES
+
+Resultados:
+
+* Monorepo integrado.
+* Auth probado con PostgreSQL y Sequelize.
+* Library probado con MongoDB y Mongoose.
+* Statistics probado contra Library real.
+* Frontend probado contra Auth real.
+* Smoke test: 11 PASS / 0 FAIL.
+* Build y lint correctos.
+
+Observación de seguridad:
+
+* Se detectaron credenciales reales en el historial de Git.
+* Las credenciales deben rotarse.
+* El historial debe purgarse o trasladarse a un remoto limpio.
+* No se considera abierta la implementación del Sprint 2 hasta cerrar esta acción.
+
+## Estado general del Sprint 2
+
+Estado: PLANIFICADO
+
+Objetivo:
+
+Permitir que un usuario autenticado administre libros, registre préstamos y devoluciones y consulte estadísticas iniciales mediante los servicios integrados.
+
+## Documentos vigentes
+
+* `docs/contracts.md`
+* `docs/sprint-2.md`
+* `docs/handoff.md`
+* `ARQUITECTURA 1.md`
+* `Proyecto.md`
+
+## Tareas asignadas
+
+| ID    | Responsable  | Rama                        | Estado    |
+| ----- | ------------ | --------------------------- | --------- |
+| S2-00 | Scrum Master | seguridad/repositorio       | Pendiente |
+| S2-01 | Por asignar  | sprint2/jwt-library         | Ready     |
+| S2-02 | Por asignar  | sprint2/books-crud          | Ready     |
+| S2-03 | Por asignar  | sprint2/loans-returns       | Ready     |
+| S2-04 | Por asignar  | sprint2/jwt-statistics      | Ready     |
+| S2-05 | Por asignar  | sprint2/statistics          | Ready     |
+| S2-06 | Por asignar  | sprint2/frontend-api        | Ready     |
+| S2-07 | Por asignar  | sprint2/frontend-books      | Ready     |
+| S2-08 | Por asignar  | sprint2/frontend-loans      | Ready     |
+| S2-09 | Por asignar  | sprint2/frontend-statistics | Ready     |
+| S2-10 | Scrum Master | sprint2/integration         | Pendiente |
+
+## Bloqueos iniciales
+
+* Rotación y purga de credenciales expuestas.
+* Asignación definitiva de responsables.
+* Copiar los contratos del Sprint 2 a `docs/contracts.md`.
+
+## Próximo paso
+
+1. Cerrar S2-00.
+2. Congelar contratos.
+3. Asignar responsables.
+4. Crear ramas.
+5. Entregar un prompt independiente por tarea.
