@@ -81,11 +81,12 @@ Carpetas de los cuatro proyectos.
 S1-02 — Servicio Auth
 Responsable principal: Scrum Master con Fable 5.
 Resultado:
+PostgreSQL.
+Sequelize.
 Registro.
 Login.
 Argon2.
 JWT.
-MongoDB.
 Validaciones.
 S1-03 — Servicio Library
 Responsable principal: Backend Developer A con Grok Build.

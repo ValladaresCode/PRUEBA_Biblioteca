@@ -1,10 +1,11 @@
 Estado y handoff del proyecto
-Última actualización: pendiente
+Última actualización: 2026-07-15
 Responsable de actualización: Scrum Master
 Sprint actual: Sprint 1
+
 1. Estado general
 Estado:
-NO INICIADO
+INTEGRADO (APROBADO CON OBSERVACIONES)
 Valores permitidos:
 NO INICIADO
 EN PROGRESO
@@ -12,133 +13,136 @@ BLOQUEADO
 LISTO PARA INTEGRAR
 INTEGRADO
 FINALIZADO
+
+Nota: verificación de integración completa registrada en docs/integration-sprint-1.md.
+
 2. Rama principal
 main
+Rama de trabajo de la integración: ft/angel
+
 3. Estado por componente
+
 Fundación del monorepo
-Estado: NO INICIADO
-Rama: sprint1/foundation-auth
+Estado: INTEGRADO
 Responsable: Scrum Master
-Agente: Fable 5
-Completado:
-Nada todavía.
-Pendiente:
-Crear workspace pnpm.
-Crear configuración raíz.
-Crear documentación compartida.
-Verificar instalación desde la raíz.
+Completado y probado:
+Workspace pnpm (4 proyectos).
+Configuración raíz (package.json con scripts dev:*, smoke:sprint1).
+Documentación compartida (contracts, sprint-1, handoff, integration).
+Un único lockfile en la raíz (eliminados lockfiles internos).
+pnpm install / build / lint OK desde la raíz.
 Bloqueos:
-Ninguno registrado.
+Ninguno.
+
 Auth Service
-Estado: NO INICIADO
-Rama: sprint1/foundation-auth
+Estado: INTEGRADO
 Responsable: Scrum Master
-Agente: Fable 5
-Completado:
-Nada todavía.
-Pendiente:
-Modelo User.
-Registro.
-Login.
-Argon2.
-JWT.
-Validaciones.
-Pruebas manuales.
+Persistencia: PostgreSQL + Sequelize (Argon2, JWT).
+Completado y probado:
+Modelo User (UUID, email único en minúsculas, password hasheada).
+Registro (201), duplicado (409), login (200), credenciales incorrectas (401), validación (400).
+Contraseña almacenada como hash Argon2 (verificado en PostgreSQL).
+JWT con sub, role, iss, aud, exp.
+/health 200.
 Bloqueos:
-Ninguno registrado.
+Ninguno funcional. Ver problema de secretos en historial (sección 7).
+
 Library Service
-Estado: NO INICIADO
-Rama: sprint1/library
+Estado: INTEGRADO
 Responsable: Backend Developer A
-Agente: Grok Build
-Completado:
-Nada todavía.
-Pendiente:
+Completado y probado:
 Modelo Book.
-MongoDB.
-GET /api/v1/books.
-Health check.
+Conexión real a MongoDB.
+GET /api/v1/books → {items, total} (total === items.length, createdAt presente).
+Script seed idempotente (pnpm --filter service-library seed).
+/health 200.
 Bloqueos:
-Ninguno registrado.
+Ninguno.
+
 Statistics Service
-Estado: NO INICIADO
-Rama: sprint1/statistics
+Estado: INTEGRADO
 Responsable: Backend Developer B
-Agente: Gemini CLI
-Completado:
-Nada todavía.
-Pendiente:
-Consumo de Library.
-Cálculo de resumen.
-GET /api/v1/summary.
-Manejo de errores.
+Completado y probado:
+Consumo HTTP de Library con fetch nativo + timeout (AbortSignal.timeout).
+Validación del contrato de Library (200 inválido → 503).
+GET /api/v1/summary → {totalBooks, availableBooks, categories, latestBooks} (cálculo propio verificado: 6/4/4, últimos 5 en orden desc).
+Manejo de caída de Library → 503 sin stack trace; el servicio sigue vivo.
+/health 200.
 Bloqueos:
-Depende del contrato de Library, pero puede trabajar con datos simulados mientras Library se completa.
+Ninguno.
+
 Frontend
-Estado: NO INICIADO
-Rama: sprint1/frontend-auth
+Estado: INTEGRADO
 Responsable: Frontend Developer
-Agente: por asignar
-Completado:
-Nada todavía.
-Pendiente:
-Registro.
-Login.
-Zustand.
-Axios.
-Ruta /app.
-Base visual.
+Completado y probado (en navegador):
+/register, /login, /app.
+Validación de contraseña mínima 8 (alineada con Auth) sin llamar a Auth si falla.
+Lectura de errores de validación (errors[0].message).
+Consumo de Auth real vía Axios; sin errores CORS.
+Estado de autenticación con Zustand persistente (sobrevive recarga).
+Logout limpia sesión y redirige a /login.
+El JWT no se muestra en pantalla.
 Bloqueos:
-Depende de los contratos de Auth, pero puede trabajar inicialmente con respuestas simuladas.
+Ninguno.
+
 4. Contratos vigentes
 Fuente de verdad:
 docs/contracts.md
 Cambios realizados durante el sprint:
-Ninguno.
+Variables de Auth: DATABASE_URL (PostgreSQL) en lugar de URI_MONGO — ya reflejado en contracts.md sección 11.
+
 5. Pull Requests
 Componente	PR	Estado	Revisado por
-Fundación/Auth	Pendiente	No creado	Pendiente
-Library	Pendiente	No creado	Pendiente
-Statistics	Pendiente	No creado	Pendiente
-Frontend	Pendiente	No creado	Pendiente
+Fundación/Auth	#3	Integrado	Equipo
+Library	#1	Integrado	Equipo
+Statistics	#4	Integrado	Equipo
+Frontend	#2	Integrado	Equipo
+Integración/cierre Sprint 1	Pendiente	Por crear	Pendiente
+
 6. Pruebas ejecutadas
-Instalación
-Pendiente
-Auth
-Pendiente
-Library
-Pendiente
-Statistics
-Pendiente
-Frontend
-Pendiente
-Flujo completo desde main
-Pendiente
+Instalación (pnpm install raíz): OK
+Build (pnpm build): OK
+Lint (pnpm lint): OK
+Auth (register/login/409/401/400 + hash Argon2 + JWT): OK
+Library (GET /books real + seed): OK
+Statistics (summary real + caída 503): OK
+Frontend (flujo completo en navegador, 16 checks): OK
+Smoke test (pnpm smoke:sprint1): 11 PASS / 0 FAIL
+Flujo completo desde main: pendiente (probado desde rama de integración ft/angel; falta merge a main)
+
 7. Problemas conocidos
-Ninguno registrado todavía.
+1. Secretos en el historial de Git: service-auth/.env de sprints previos (commits 6a3d9c2, 8cd4b25) con credenciales reales (Supabase, Gmail, Cloudinary). No está en el árbol actual pero sí en el historial. Acción: rotar credenciales y purgar historial. Bloquea un APROBADO limpio.
+2. Auth verificado contra un contenedor Docker de PostgreSQL (puerto 5434) por no conocerse la contraseña del PostgreSQL local (5432). Cada integrante configura su propio DATABASE_URL.
+3. /health de Library y Statistics no usa el formato común (contracts.md no lo define; no bloqueante).
+
 8. Decisiones tomadas
-Todo el proyecto usa JavaScript.
-Todo el proyecto usa ESM.
-Todo el proyecto usa pnpm.
-Node.js 22.
-- Auth utiliza PostgreSQL con Sequelize.
-- Library utiliza MongoDB con Mongoose.
-- Statistics no necesita base de datos durante el Sprint 1.
-Statistics utiliza fetch nativo.
-Gemini no se integra durante el Sprint 1.
+Todo el proyecto usa JavaScript + ESM + pnpm + Node.js 22.
+Auth usa PostgreSQL + Sequelize (corrección respecto al plan inicial que decía Mongoose).
+Library usa MongoDB + Mongoose.
+Statistics no usa base de datos; consume Library con fetch nativo.
+Contraseña mínima 8 caracteres en cliente y servidor.
+Docker solo como infraestructura local de prueba (sin Dockerfiles en el repo).
 Los contratos están congelados en docs/contracts.md.
+
 9. Próximo paso inmediato
-Crear ramas.
-Leer docs/sprint-1.md.
-Leer docs/contracts.md.
-Ejecutar las tareas asignadas.
-Actualizar este documento antes de integrar.
-10. Información necesaria para continuar en otra sesión
-Para continuar el proyecto, leer en este orden:
+Crear el PR de cierre/integración del Sprint 1 hacia main.
+Rotar y purgar los secretos del historial.
+Ejecutar el smoke test una vez integrado en main.
+
+10. Condición para iniciar el Sprint 2
+El Sprint 2 puede planificarse tras la Review, considerando:
+qué quedó funcional (todo el incremento del Sprint 1);
+la observación de seguridad (secretos en historial) resuelta o con plan;
+los contratos a conservar (los actuales, congelados);
+próximas capacidades: CRUD de libros, préstamos/devoluciones, protección JWT en Library/Statistics, estadísticas ampliadas.
+
+11. Información necesaria para continuar en otra sesión
+Leer en este orden:
 Proyecto.md
 ARQUITECTURA 1.md
 docs/contracts.md
 docs/sprint-1.md
 docs/handoff.md
+docs/integration-sprint-1.md
 El código del subproyecto correspondiente
 No asumir que una funcionalidad está terminada si no aparece como completada y probada en este documento.

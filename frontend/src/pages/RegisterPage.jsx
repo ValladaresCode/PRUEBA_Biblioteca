@@ -23,8 +23,8 @@ export default function RegisterPage() {
       setApiError('Todos los campos son obligatorios.')
       return
     }
-    if (password.length < 6) {
-      setApiError('La contraseña debe tener al menos 6 caracteres.')
+    if (password.length < 8) {
+      setApiError('La contraseña debe tener al menos 8 caracteres.')
       return
     }
     setLoading(true)
@@ -38,8 +38,8 @@ export default function RegisterPage() {
       }
     } catch (err) {
       const msg =
+        (err.response?.data?.errors?.length ? err.response.data.errors[0].message : null) ||
         err.response?.data?.message ||
-        (err.response?.data?.errors?.length ? err.response.data.errors[0].msg : null) ||
         'Error de conexión con el servidor.'
       setApiError(msg)
     } finally {
@@ -91,7 +91,7 @@ export default function RegisterPage() {
             autoComplete="new-password"
             value={form.password}
             onChange={handleChange}
-            placeholder="Mínimo 6 caracteres"
+            placeholder="Mínimo 8 caracteres"
             className="w-full rounded-md border border-border bg-surface px-4 py-2.5 text-sm text-text placeholder:text-text-muted focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors duration-150"
           />
         </div>

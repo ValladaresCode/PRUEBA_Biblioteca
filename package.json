@@ -1,21 +1,31 @@
 {
-"name": "biblioteca-app",
-"version": "1.0.0",
-"private": true,
-"description": "Monorepo del sistema distribuido de gestión bibliotecaria",
-"license": "MIT",
-"packageManager": "pnpm@10.29.3",
-"engines": {
-"node": ">=22",
-"pnpm": ">=10"
-},
-"scripts": {
-"dev": "pnpm -r --parallel --if-present run dev",
-"start": "pnpm -r --parallel --if-present run start",
-"build": "pnpm -r --if-present run build",
-"lint": "pnpm -r --if-present run lint",
-"lint:fix": "pnpm -r --if-present run lint:fix",
-"format": "pnpm -r --if-present run format",
-"format:check": "pnpm -r --if-present run format:check"
-}
+  "name": "biblioteca-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Monorepo del sistema distribuido de gestión bibliotecaria",
+  "license": "MIT",
+  "packageManager": "pnpm@10.29.3",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10"
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel --if-present run dev",
+    "dev:frontend": "pnpm --filter gestor-biblioteca dev",
+    "dev:auth": "pnpm --filter biblioteca-auth-service dev",
+    "dev:library": "pnpm --filter service-library dev",
+    "dev:statistics": "pnpm --filter service-statistics dev",
+    "start": "pnpm -r --parallel --if-present run start",
+    "build": "pnpm -r --if-present run build",
+    "lint": "pnpm -r --if-present run lint",
+    "lint:fix": "pnpm -r --if-present run lint:fix",
+    "format": "pnpm -r --if-present run format",
+    "format:check": "pnpm -r --if-present run format:check",
+    "smoke:sprint1": "node scripts/smoke-sprint-1.mjs"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "argon2"
+    ]
+  }
 }
