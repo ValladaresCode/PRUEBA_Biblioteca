@@ -2,6 +2,7 @@
 
 const BOOKS_PATH = '/api/v1/books';
 const LATEST_BOOKS_LIMIT = 5;
+const LIBRARY_TIMEOUT_MS = 5000;
 
 /**
  * Error dedicado para fallas al consultar el Servicio Library, de forma que
@@ -29,7 +30,11 @@ const fetchBooksFromLibrary = async () => {
 
   let response;
   try {
-    response = await fetch(`${baseUrl}${BOOKS_PATH}`);
+    // AbortSignal.timeout aborta la petición si Library tarda demasiado, para
+    // no bloquear indefinidamente el cálculo del resumen.
+    response = await fetch(`${baseUrl}${BOOKS_PATH}`, {
+      signal: AbortSignal.timeout(LIBRARY_TIMEOUT_MS),
+    });
   } catch {
     throw new LibraryUnavailableError('No se pudo conectar con el Servicio Library');
   }
@@ -47,7 +52,18 @@ const fetchBooksFromLibrary = async () => {
     throw new LibraryUnavailableError('La respuesta del Servicio Library no es un JSON válido');
   }
 
-  return body?.data?.items ?? [];
+  // Library puede responder 200 pero con un contrato inválido; en ese caso
+  // tratamos la dependencia como no disponible (503) en vez de calcular sobre
+  // datos incorrectos.
+  if (body?.success !== true || typeof body?.data !== 'object' || body.data === null) {
+    throw new LibraryUnavailableError('El Servicio Library devolvió una respuesta con formato inválido');
+  }
+
+  if (!Array.isArray(body.data.items)) {
+    throw new LibraryUnavailableError('El Servicio Library no devolvió una lista de libros válida');
+  }
+
+  return body.data.items;
 };
 
 /**
