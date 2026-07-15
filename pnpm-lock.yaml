@@ -123,9 +123,15 @@ importers:
       express:
         specifier: ^5.1.0
         version: 5.2.1
+      express-validator:
+        specifier: ^7.3.2
+        version: 7.3.2
       helmet:
         specifier: ^8.1.0
         version: 8.3.0
+      jsonwebtoken:
+        specifier: ^9.0.3
+        version: 9.0.3
       mongoose:
         specifier: ^8.9.5
         version: 8.24.1
@@ -151,6 +157,9 @@ importers:
       helmet:
         specifier: ^8.1.0
         version: 8.3.0
+      jsonwebtoken:
+        specifier: ^9.0.3
+        version: 9.0.3
       morgan:
         specifier: ^1.10.1
         version: 1.11.0
