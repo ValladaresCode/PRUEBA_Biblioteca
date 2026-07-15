@@ -33,11 +33,11 @@ const bookSchema = new mongoose.Schema(
     year: {
       type: Number,
       required: [true, 'El anio es obligatorio'],
-      // Validacion simple para asegurar que sea un entero.
       validate: {
         validator: Number.isInteger,
         message: 'El anio debe ser un numero entero',
       },
+      max: [new Date().getFullYear(), 'El anio no puede ser futuro'],
     },
     available: {
       type: Boolean,
