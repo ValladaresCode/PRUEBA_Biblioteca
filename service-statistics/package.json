@@ -1,0 +1,28 @@
+{
+  "name": "service-statistics",
+  "version": "1.0.0",
+  "description": "Servicio de estadisticas y recomendaciones (Statistics) - Sprint 1. Expone GET /api/v1/summary consumiendo el Servicio Library.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [
+    "statistics",
+    "summary",
+    "express"
+  ],
+  "author": "Backend Developer B",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "morgan": "^1.10.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
