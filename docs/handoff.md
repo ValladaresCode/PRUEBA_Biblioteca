@@ -187,9 +187,10 @@ Permitir que un usuario autenticado administre libros, registre préstamos y dev
 
 ## Tareas asignadas
 
-| ID    | Responsable  | Rama                        | Estado    |
-| ----- | ------------ | --------------------------- | --------- |
-| S2-00 | Scrum Master | seguridad/repositorio       | Pendiente |
+| ID     | Responsable  | Rama                        | Estado                              |
+| ------ | ------------ | --------------------------- | ------------------------------------ |
+| S2-00  | Scrum Master | seguridad/repositorio       | **Diferido** por decisión expresa del Scrum Master (no cerrado, no solucionado) |
+| S2-00B | Scrum Master | ft/angel                    | Ver sección "Actualización — S2-00B" más abajo |
 | S2-01 | Por asignar  | sprint2/jwt-library         | Ready     |
 | S2-02 | Por asignar  | sprint2/books-crud          | Ready     |
 | S2-03 | Por asignar  | sprint2/loans-returns       | Ready     |
@@ -214,3 +215,25 @@ Permitir que un usuario autenticado administre libros, registre préstamos y dev
 3. Asignar responsables.
 4. Crear ramas.
 5. Entregar un prompt independiente por tarea.
+
+## Actualización — S2-00B (Congelación contractual y preparación técnica)
+
+Responsable: Scrum Master (Fable 5).
+Rama: `ft/angel`.
+
+Resultado:
+
+- **S2-00 (rotación/purga de credenciales) fue diferido por decisión expresa del Scrum Master.** No se marca como cerrado, aprobado, solucionado ni verificado. El riesgo de secretos históricos permanece **abierto**.
+- Mientras S2-00 siga pendiente, el veredicto máximo del proyecto es `APROBADO CON OBSERVACIONES`; no puede declararse un `APROBADO` limpio.
+- `docs/contracts.md` fue ampliado con una sección "Contratos congelados — Sprint 2" (JWT, Books, Loans/Returns, Statistics, Frontend, variables compartidas), preservando intactos los contratos del Sprint 1.
+- `docs/sprint-2.md` fue corregido únicamente donde contradecía los contratos congelados: `available` no editable por el cliente, `GET /summary` público, `GET /statistics` protegido, Books conserva `_id`, DELETE es borrado físico, y notas explícitas de que S2-00 está diferido (no solucionado) y de que no se introduce ninguna función del Sprint 3.
+- Dependencias añadidas mediante `pnpm --filter <paquete> add <dep>` (sin fijar versiones manualmente):
+  - `service-library`: `jsonwebtoken`, `express-validator`.
+  - `service-statistics`: `jsonwebtoken`.
+- Variables `JWT_SECRET`, `JWT_ISSUER`, `JWT_AUDIENCE` documentadas (placeholders, sin secretos reales) en `service-library/.env.example`, `service-statistics/.env.example` y en el `.env.example` raíz.
+- Sigue existiendo un único `pnpm-lock.yaml` en la raíz; no se generaron lockfiles internos.
+- **No se implementó ninguna feature funcional del Sprint 2** (sin middlewares JWT, sin controllers, sin routers montados, sin CRUD de Books, sin Loans/Returns, sin cambios en Statistics ni en frontend).
+
+Estado sugerido de S2-00B: ver reporte de la tarea (`DONE` a nivel de preparación técnica; **no** implica que S2-00 ni el Sprint 2 estén cerrados).
+
+**El Sprint 2 se abre bajo observación únicamente si todas las verificaciones de S2-00B (`pnpm install`, `pnpm build`, `pnpm lint`, comprobación sintáctica de los tres servicios, único lockfile en la raíz) pasan.** Ver comandos y resultados en el reporte de la tarea S2-00B.

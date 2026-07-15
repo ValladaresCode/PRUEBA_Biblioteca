@@ -18,6 +18,8 @@ El Sprint 2 puede iniciar únicamente cuando:
 - `docs/handoff.md` refleja el cierre real del Sprint 1.
 - `docs/contracts.md` contiene los contratos congelados del Sprint 2.
 
+> **Nota (S2-00 diferido):** la rotación/purga de credenciales (S2-00) fue diferida por decisión expresa del Scrum Master; no está resuelta. El Sprint 2 continúa bajo **riesgo aceptado**, no bajo la condición de entrada cumplida. Mientras S2-00 siga pendiente, el veredicto máximo del proyecto es `APROBADO CON OBSERVACIONES`. No se introduce ninguna función del Sprint 3 durante este Sprint.
+
 ## Objetivo del Sprint
 
 Al finalizar el Sprint 2, un usuario autenticado podrá administrar el catálogo de libros, registrar préstamos y devoluciones desde el frontend y consultar estadísticas iniciales calculadas por el Servicio Statistics a partir de información real del Servicio Library.
@@ -159,10 +161,11 @@ Content-Type: application/json
   "title": "Cien años de soledad",
   "author": "Gabriel García Márquez",
   "category": "Novela",
-  "year": 1967,
-  "available": true
+  "year": 1967
 }
 ```
+
+El servidor crea el libro con `available: true` siempre; el cliente no puede controlar `available` (no forma parte del body aceptado). Los Books conservan `_id` nativo de Mongoose; no se transforma a `id`.
 
 Respuesta exitosa: `201`.
 
@@ -174,7 +177,7 @@ Authorization: Bearer <jwt>
 Content-Type: application/json
 ```
 
-Acepta únicamente campos permitidos del modelo Book.
+Acepta únicamente campos permitidos del modelo Book: `title`, `author`, `category`, `year`. No puede modificar `available`, `_id`, `createdAt` ni `updatedAt`.
 
 Respuesta exitosa: `200`.
 
@@ -187,7 +190,7 @@ Authorization: Bearer <jwt>
 
 Respuesta exitosa: `200`.
 
-No puede eliminarse un libro con un préstamo activo. En ese caso responde `409`.
+El borrado es físico (hard delete), no soft delete. Responde `404` si el libro no existe. No puede eliminarse un libro con un préstamo activo. En ese caso responde `409`.
 
 ### Consultar libros
 
@@ -316,6 +319,8 @@ GET /api/v1/statistics
 Authorization: Bearer <jwt>
 ```
 
+`GET /api/v1/summary` permanece **público** y conserva el contrato del Sprint 1 (no requiere JWT). `GET /api/v1/statistics` es el único endpoint nuevo de Statistics protegido con JWT.
+
 Statistics consume Library y calcula:
 
 ```json
@@ -359,6 +364,8 @@ Los agentes de features deben crear sus módulos sin modificar esos archivos. El
 
 **Responsable recomendado:** Scrum Master.
 
+**Estado: DIFERIDO por decisión expresa del Scrum Master.** No está cerrado, aprobado, solucionado ni verificado. El Sprint 2 continúa bajo riesgo aceptado mientras esta tarea permanezca pendiente.
+
 **No consume tiempo de implementación del Sprint si puede resolverse antes.**
 
 Resultado:
@@ -372,6 +379,7 @@ Resultado:
 Criterio:
 
 - El Sprint 2 no se abre con secretos activos expuestos.
+- Mientras S2-00 no se resuelva, el veredicto máximo del Sprint 2 es `APROBADO CON OBSERVACIONES`; no puede declararse `APROBADO` sin observaciones.
 
 ---
 
