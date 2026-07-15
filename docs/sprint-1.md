@@ -31,14 +31,17 @@ Añadir .gitignore.
 Añadir .env.example.
 Añadir README inicial.
 No guardar secretos reales.
-Auth Service
-Crear modelo User.
-Registrar usuarios.
-Iniciar sesión.
-Cifrar contraseñas con Argon2.
-Emitir JWT.
-Validar datos con express-validator.
-Añadir /health.
+### Auth Service
+
+- Configurar PostgreSQL.
+- Configurar Sequelize.
+- Crear modelo User.
+- Registrar usuarios.
+- Iniciar sesión.
+- Cifrar contraseñas con Argon2.
+- Emitir JWT.
+- Validar datos con express-validator.
+- Añadir /health.
 Library Service
 Crear modelo Book.
 Conectar con MongoDB.

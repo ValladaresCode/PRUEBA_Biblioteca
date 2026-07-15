@@ -1,79 +1,71 @@
-'use strict';
+import cors from 'cors'
+import express from 'express'
+import rateLimit from 'express-rate-limit'
+import helmet from 'helmet'
+import morgan from 'morgan'
 
-import express from 'express';
-import cookieParser from 'cookie-parser';
-import helmet from 'helmet';
-import morgan from 'morgan';
-import { dbConnection } from './db.js';
-// Ensure models are registered before DB sync
-import '../src/users/user.model.js';
-import '../src/users/user-update-request.model.js';
-import '../src/auth/role.model.js';
-import '../src/auth/signup-request.model.js';
-import '../src/auth/refresh-token.model.js';
-import { requestLimit } from '../middlewares/request-limit.js';
-import { corsMiddleware } from './cors-configuration.js';
-import { helmetConfiguration } from './helmet-configuration.js';
-import {
-  errorHandler,
-  notFound,
-} from '../middlewares/server-genericError-handler.js';
-import authRoutes from '../src/auth/auth.routes.js';
-import userRoutes from '../src/users/user.routes.js';
-import swaggerUi from 'swagger-ui-express';
-import swaggerSpec from './swagger.js';
+import { authRouter } from '../src/auth/auth.routes.js'
 
-const BASE_PATH = '/api/v1';
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'Demasiadas solicitudes, intenta de nuevo más tarde',
+  },
+})
 
-const middlewares = (app) => {
-  app.use(corsMiddleware);
-  app.use(express.urlencoded({ extended: false, limit: '10mb' }));
-  app.use(express.json({ limit: '10mb' }));
-  app.use(cookieParser());
-  app.use(helmet(helmetConfiguration));
-  app.use(requestLimit);
-  app.use(morgan(process.env.NODE_ENV === 'development' ? 'dev' : 'combined'));
-};
+export const createApp = () => {
+  const app = express()
 
-const routes = (app) => {
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-  app.use(`${BASE_PATH}/auth`, authRoutes);
-  app.use(`${BASE_PATH}/users`, userRoutes);
+  app.use(helmet())
+  app.use(cors())
+  app.use(morgan('dev'))
+  app.use(express.urlencoded({ extended: false }))
+  app.use(express.json())
 
-  app.get(`${BASE_PATH}/health`, (req, res) => {
+  app.get('/health', (req, res) => {
     res.status(200).json({
-      status: 'Healthy',
-      timestamp: new Date().toISOString(),
-      service: 'KinalSports Authentication Service',
-    });
-  });
-  // 404 handler (standardized)
-  app.use(notFound);
-};
+      success: true,
+      message: 'Auth service en funcionamiento',
+      data: {
+        service: 'biblioteca-auth-service',
+        uptime: process.uptime(),
+      },
+    })
+  })
 
-export const initServer = async () => {
-  const app = express();
-  const PORT = process.env.PORT || 8080;
-  app.set('trust proxy', 1);
+  app.use('/api/v1/auth', authLimiter, authRouter)
 
-  try {
-    await dbConnection();
-    // Seed essential data (roles)
-    const { seedRoles } = await import('../helpers/role-seed.js');
-    await seedRoles();
-    middlewares(app);
-    routes(app);
+  app.use((req, res) => {
+    res.status(404).json({
+      success: false,
+      message: `Ruta no encontrada: ${req.method} ${req.originalUrl}`,
+    })
+  })
 
-    app.use(errorHandler);
+  app.use((error, req, res, next) => {
+    if (res.headersSent) {
+      return next(error)
+    }
 
-    app.listen(PORT, '0.0.0.0', () => {
-      console.log(`GestorBancario Auth Server running on port ${PORT}`);
-      console.log(
-        `Revisar estado: http://localhost:${PORT}${BASE_PATH}/health`
-      );
-    });
-  } catch (err) {
-    console.error(`Error starting Auth Server: ${err.message}`);
-    process.exit(1);
-  }
-};
+    if (error.type === 'entity.parse.failed') {
+      return res.status(400).json({
+        success: false,
+        message: 'El cuerpo de la solicitud no es un JSON válido',
+      })
+    }
+
+    // No exponemos stack traces ni detalles internos de PostgreSQL al cliente.
+    console.error('Error no controlado:', error)
+
+    return res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor',
+    })
+  })
+
+  return app
+}
