@@ -121,9 +121,9 @@ Todo el proyecto usa JavaScript.
 Todo el proyecto usa ESM.
 Todo el proyecto usa pnpm.
 Node.js 22.
-Auth utiliza MongoDB y Mongoose.
-Library utiliza MongoDB y Mongoose.
-Statistics no necesita MongoDB en el Sprint 1.
+- Auth utiliza PostgreSQL con Sequelize.
+- Library utiliza MongoDB con Mongoose.
+- Statistics no necesita base de datos durante el Sprint 1.
 Statistics utiliza fetch nativo.
 Gemini no se integra durante el Sprint 1.
 Los contratos están congelados en docs/contracts.md.

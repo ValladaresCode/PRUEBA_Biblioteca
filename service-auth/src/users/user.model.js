@@ -1,249 +1,62 @@
-import { DataTypes } from 'sequelize';
-import { sequelize } from '../../configs/db.js';
-import { generateUserId } from '../../helpers/uuid-generator.js';
+import { DataTypes, Model } from 'sequelize'
 
-// Modelo User simplificado basado en esquema Mongoose
-export const User = sequelize.define(
-  'User',
+import { sequelize } from '../../configs/db.js'
+
+export class User extends Model {
+  // Representación pública: nunca incluye la contraseña.
+  toPublicJSON() {
+    return {
+      id: this.id,
+      name: this.name,
+      email: this.email,
+      role: this.role,
+    }
+  }
+}
+
+User.init(
   {
-    Id: {
-      type: DataTypes.STRING(16),
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
-      field: 'id',
-      defaultValue: () => generateUserId(),
     },
-    Name: {
-      type: DataTypes.STRING(100),
+    name: {
+      type: DataTypes.STRING,
       allowNull: false,
-      field: 'name',
-      validate: {
-        notEmpty: { msg: 'El nombre es requerido' },
-        len: {
-          args: [1, 100],
-          msg: 'El nombre no puede exceder 100 caracteres',
-        },
-      },
     },
-    Email: {
+    email: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
-      field: 'email',
       validate: {
-        notEmpty: { msg: 'El email es requerido' },
-        isEmail: { msg: 'El email no tiene un formato válido' },
+        isEmail: true,
       },
     },
-    Password: {
+    password: {
       type: DataTypes.STRING,
       allowNull: false,
-      field: 'password',
-      validate: {
-        notEmpty: { msg: 'La contraseña es requerida' },
-      },
     },
-    IsActive: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
+    role: {
+      type: DataTypes.STRING,
       allowNull: false,
-      field: 'is_active',
-    },
-    LastSensitiveChangeAt: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      field: 'last_sensitive_change_at',
+      defaultValue: 'LIBRARIAN_ROLE',
     },
   },
   {
+    sequelize,
+    modelName: 'User',
     tableName: 'users',
     timestamps: true,
-    indexes: [{ fields: ['email'], unique: true }, { fields: ['is_active'] }],
-  }
-);
-
-// Modelo UserProfile (con Imagen para almacenar la foto de perfil)
-export const UserProfile = sequelize.define(
-  'UserProfile',
-  {
-    Id: {
-      type: DataTypes.STRING(16),
-      primaryKey: true,
-      field: 'id',
-      defaultValue: () => generateUserId(),
+    defaultScope: {
+      // Por defecto nunca devolvemos el hash de la contraseña.
+      attributes: { exclude: ['password'] },
     },
-    UserId: {
-      type: DataTypes.STRING(16),
-      allowNull: false,
-      field: 'user_id',
-      references: {
-        model: User,
-        key: 'id',
+    scopes: {
+      // Scope explícito para el login, donde sí necesitamos el hash.
+      withPassword: {
+        attributes: { include: ['password'] },
       },
-    },
-    Imagen: {
-      type: DataTypes.STRING,
-      defaultValue: null,
-      field: 'imagen',
-    },
-    Phone: {
-      type: DataTypes.STRING(8),
-      allowNull: false,
-      field: 'phone',
-      validate: {
-        notEmpty: { msg: 'El número de teléfono es obligatorio.' },
-        len: {
-          args: [8, 8],
-          msg: 'El número de teléfono debe tener exactamente 8 dígitos.',
-        },
-        isNumeric: { msg: 'El teléfono solo debe contener números.' },
-      },
-    },
-    // La obligatoriedad de fecha/dpi/ingresos se valida en las rutas
-    // (validateRegister). Aquí solo formato: los campos son allowNull
-    // porque existen perfiles legacy sin estos datos.
-    FechaNacimiento: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      field: 'fecha_nacimiento',
-      validate: {
-        isDate: { msg: 'La fecha de nacimiento no es válida.' },
-      },
-    },
-    Dpi: {
-      type: DataTypes.STRING(13),
-      allowNull: true,
-      unique: true,
-      field: 'dpi',
-      validate: {
-        len: {
-          args: [13, 13],
-          msg: 'El DPI debe tener exactamente 13 dígitos.',
-        },
-        isNumeric: { msg: 'El DPI solo debe contener números.' },
-      },
-    },
-    IngresosMensuales: {
-      type: DataTypes.DECIMAL(18, 2),
-      allowNull: true,
-      field: 'ingresos_mensuales',
-      validate: {
-        min: {
-          args: [0.01],
-          msg: 'Los ingresos mensuales deben ser mayores a 0.',
-        },
-      },
-    },
-    Direccion: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      field: 'direccion',
-    },
-    NombreTrabajo: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      field: 'nombre_trabajo',
     },
   },
-  {
-    tableName: 'user_profiles',
-    timestamps: false,
-  }
-);
-
-// Modelo UserEmail (equivalente a UserEmail.cs en .NET) - usando snake_case
-export const UserEmail = sequelize.define(
-  'UserEmail',
-  {
-    Id: {
-      type: DataTypes.STRING(16),
-      primaryKey: true,
-      field: 'id',
-      defaultValue: () => generateUserId(),
-    },
-    UserId: {
-      type: DataTypes.STRING(16),
-      allowNull: false,
-      field: 'user_id',
-      references: {
-        model: User,
-        key: 'id',
-      },
-    },
-    EmailVerified: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-      field: 'email_verified',
-    },
-    EmailVerificationToken: {
-      type: DataTypes.STRING(256),
-      allowNull: true,
-      field: 'email_verification_token',
-    },
-    EmailVerificationTokenExpiry: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      field: 'email_verification_token_expiry',
-    },
-  },
-  {
-    tableName: 'user_emails',
-    timestamps: false,
-  }
-);
-
-// Modelo UserPasswordReset (equivalente a UserPasswordReset.cs en .NET) - usando snake_case
-export const UserPasswordReset = sequelize.define(
-  'UserPasswordReset',
-  {
-    Id: {
-      type: DataTypes.STRING(16),
-      primaryKey: true,
-      field: 'id',
-      defaultValue: () => generateUserId(),
-    },
-    UserId: {
-      type: DataTypes.STRING(16),
-      allowNull: false,
-      field: 'user_id',
-      references: {
-        model: User,
-        key: 'id',
-      },
-    },
-    PasswordResetToken: {
-      type: DataTypes.STRING(256),
-      allowNull: true,
-      field: 'password_reset_token',
-    },
-    PasswordResetTokenExpiry: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      field: 'password_reset_token_expiry',
-    },
-    // Marca cuándo se consumió el token (sin nulificarlo) para poder distinguir
-    // 'usado' de 'nunca existió' vía el endpoint de status. NULL = aún no usado.
-    PasswordResetTokenUsedAt: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      field: 'password_reset_token_used_at',
-    },
-  },
-  {
-    tableName: 'user_password_resets',
-    timestamps: false,
-  }
-);
-
-// Definir las relaciones (equivalente a las navigation properties en .NET)
-User.hasOne(UserProfile, { foreignKey: 'user_id', as: 'UserProfile' });
-UserProfile.belongsTo(User, { foreignKey: 'user_id', as: 'User' });
-
-User.hasOne(UserEmail, { foreignKey: 'user_id', as: 'UserEmail' });
-UserEmail.belongsTo(User, { foreignKey: 'user_id', as: 'User' });
-
-User.hasOne(UserPasswordReset, {
-  foreignKey: 'user_id',
-  as: 'UserPasswordReset',
-});
-UserPasswordReset.belongsTo(User, { foreignKey: 'user_id', as: 'User' });
+)

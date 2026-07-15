@@ -109,8 +109,8 @@ VITE_LIBRARY_API_URL=http://localhost:4001/api/v1
 VITE_STATISTICS_API_URL=http://localhost:4002/api/v1
 11. Variables de Auth
 PORT=4000
-URI_MONGO=mongodb://localhost:27017/biblioteca_auth
-JWT_SECRET=replace_me
+DATABASE_URL=postgresql://postgres:password@localhost:5432/biblioteca_auth
+JWT_SECRET=replace_with_a_secure_secret
 JWT_ISSUER=biblioteca-auth
 JWT_AUDIENCE=biblioteca-services
 JWT_EXPIRES_IN=2h

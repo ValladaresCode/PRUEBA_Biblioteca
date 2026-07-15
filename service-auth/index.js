@@ -1,32 +1,22 @@
-import dotenv from 'dotenv';
-import { initServer } from './configs/app.js';
-import { sequelize } from './configs/db.js';
-import './src/users/user.model.js';
-import './src/users/user-update-request.model.js';
-import './src/auth/role.model.js';
-import './src/auth/signup-request.model.js';
-import './src/auth/refresh-token.model.js';
-import { seedData } from './helpers/data-seeder.js';
+import 'dotenv/config'
 
-// Configurar variables de entorno
-dotenv.config();
+import { createApp } from './configs/app.js'
+import { dbConnection } from './configs/db.js'
+// Registrar el modelo antes de sincronizar el esquema en dbConnection().
+import './src/users/user.model.js'
 
-await sequelize.authenticate();
-await sequelize.sync({ alter: true });
-await seedData();
+const main = async () => {
+  await dbConnection()
 
-// Manejar errores no capturados
-process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err);
-  process.exit(1);
-});
+  const app = createApp()
+  const port = process.env.PORT || 4000
 
-process.on('unhandledRejection', (err, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', err);
-  process.exit(1);
-});
+  app.listen(port, () => {
+    console.log(`Auth service escuchando en http://localhost:${port}`)
+  })
+}
 
-// Inicializar servidor
-// IMPORTANTE: await es obligatorio. Sin él, el módulo termina antes de que
-// app.listen() sea llamado → el event loop queda vacío → proceso termina (código 0).
-await initServer();
+main().catch((error) => {
+  console.error('No fue posible iniciar el Auth service:', error.message)
+  process.exit(1)
+})
