@@ -21,7 +21,8 @@
     "lint:fix": "pnpm -r --if-present run lint:fix",
     "format": "pnpm -r --if-present run format",
     "format:check": "pnpm -r --if-present run format:check",
-    "smoke:sprint1": "node scripts/smoke-sprint-1.mjs"
+    "smoke:sprint1": "node scripts/smoke-sprint-1.mjs",
+    "smoke:sprint2": "node scripts/smoke-sprint-2.mjs"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

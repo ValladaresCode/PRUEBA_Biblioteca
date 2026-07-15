@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { getStatistics, getApiErrorMessage } from '../../api/library.api.js'
+import { getStatistics } from '../../api/statistics.api.js'
+import { getApiErrorMessage } from '../../api/api-error.js'
 import { Spinner } from '../../components/Spinner.jsx'
 
 const METRICS = [

@@ -4,16 +4,10 @@
  * Contrato (docs/contracts.md § S2.6):
  *   listBooks, createBook, updateBook, deleteBook, getApiErrorMessage
  *
- * Mientras S2-06 no integre el cliente en frontend/src/api, se reexporta
- * el mock local. Cuando exista el módulo real, cambiar solo este archivo:
- *
- *   export {
- *     listBooks,
- *     createBook,
- *     updateBook,
- *     deleteBook,
- *     getApiErrorMessage,
- *   } from '../../api/books.api.js'
+ * Integracion S2-10: el cliente HTTP real (S2-06) ya existe en
+ * frontend/src/api. Se reexporta desde ahi para consumir el Servicio Library
+ * real con el JWT adjunto por el interceptor de axios. El mock local
+ * (books.api.mock.js) queda solo como apoyo de desarrollo, no se usa en runtime.
  */
 
 export {
@@ -21,5 +15,6 @@ export {
   createBook,
   updateBook,
   deleteBook,
-  getApiErrorMessage,
-} from './books.api.mock.js'
+} from '../../api/library.api.js';
+
+export { getApiErrorMessage } from '../../api/api-error.js';

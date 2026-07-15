@@ -6,9 +6,11 @@ import cors from 'cors';
 import morgan from 'morgan';
 
 import { dbConnection } from './db.js';
-// Se importa el modelo para asegurar su registro en Mongoose.
+// Se importan los modelos para asegurar su registro en Mongoose.
 import '../src/books/book.model.js';
+import '../src/loans/loan.model.js';
 import bookRoutes from '../src/books/book.routes.js';
+import loanRoutes, { returnRoutes } from '../src/loans/loan.routes.js';
 
 const BASE_PATH = '/api/v1';
 
@@ -37,6 +39,8 @@ const routes = (app) => {
   });
 
   app.use(`${BASE_PATH}/books`, bookRoutes);
+  app.use(`${BASE_PATH}/loans`, loanRoutes);
+  app.use(`${BASE_PATH}/returns`, returnRoutes);
 };
 
 /**

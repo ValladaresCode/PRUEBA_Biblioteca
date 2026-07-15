@@ -237,3 +237,65 @@ Resultado:
 Estado sugerido de S2-00B: ver reporte de la tarea (`DONE` a nivel de preparación técnica; **no** implica que S2-00 ni el Sprint 2 estén cerrados).
 
 **El Sprint 2 se abre bajo observación únicamente si todas las verificaciones de S2-00B (`pnpm install`, `pnpm build`, `pnpm lint`, comprobación sintáctica de los tres servicios, único lockfile en la raíz) pasan.** Ver comandos y resultados en el reporte de la tarea S2-00B.
+
+---
+
+## Cierre del Sprint 2 — S2-10 (Integración y cierre)
+
+Última actualización: 2026-07-15
+Responsable: Integrador / Scrum Master
+Rama de integración: `claude/sprint-2-integration-closure-fej30r`
+
+### Estado general del Sprint 2
+
+Estado: **INTEGRADO (APROBADO CON OBSERVACIONES)**
+
+Detalle completo en `docs/integration-sprint-2.md`.
+
+### Estado real por tarea
+
+| ID | Componente | Estado real |
+| --- | --- | --- |
+| S2-01 | Middleware JWT Library | INTEGRADO y protegiendo rutas (401/403 verificados) |
+| S2-02 | CRUD Books | INTEGRADO (mutaciones protegidas con JWT + LIBRARIAN_ROLE) |
+| S2-03 | Loans y Returns | INTEGRADO (routers montados en `/api/v1/loans` y `/api/v1/returns`) |
+| S2-04 | Middleware JWT Statistics | INTEGRADO |
+| S2-05 | Estadísticas (`GET /statistics`) | INTEGRADO y protegido con JWT |
+| S2-06 | Cliente HTTP frontend | INTEGRADO (Books ahora usa el cliente real, no el mock) |
+| S2-07 | UI Books | INTEGRADA en `/app/books` |
+| S2-08 | UI Loans | INTEGRADA en `/app/loans` |
+| S2-09 | UI Statistics | INTEGRADA en `/app` (Resumen) |
+| S2-10 | Integración y cierre | ESTA TAREA — completada a nivel de código y verificación disponible |
+
+### Correcciones de integración (mínimas, autoría preservada)
+
+- `service-library/configs/app.js`: montados Loans y Returns; registrado el modelo Loan.
+- `service-library/src/books/book.routes.js`: corregido import roto de `validateJWT` (caía a no-op y dejaba Books sin proteger) + `requireRole('LIBRARIAN_ROLE')` en mutaciones.
+- `service-statistics/src/statistics/statistics.routes.js`: `validateJWT` aplicado solo a `/statistics`.
+- `frontend/src/features/books/booksClient.js`: cambiado del mock al cliente real.
+- `frontend/src/features/statistics/StatisticsPanel.jsx`: corregidos imports inexistentes.
+- `frontend/src/router/index.jsx`, `layouts/AppLayout.jsx`, `pages/AppPage.jsx`: rutas, navegación y montaje de Statistics.
+- `package.json` (raíz) + `scripts/smoke-sprint-2.mjs`: smoke del Sprint 2.
+
+### Pruebas ejecutadas
+
+- `pnpm install`, `pnpm build`, `pnpm lint`, `node --check` (todo el backend): OK.
+- Auth contra **PostgreSQL real**: register/login/JWT (claims y firma) OK.
+- Statistics real: `/statistics` sin JWT → 401; con JWT y Library caído → 503; `/summary` → 503 con Library caído; servicio sigue vivo.
+- Library: montaje y protección de rutas verificados con routers y middlewares reales (10/10: Books/Loans/Returns 401 sin JWT, 403 con rol incorrecto).
+
+### Pruebas NO ejecutadas (limitación de entorno)
+
+- **MongoDB no es provisionable en este entorno** (egress bloqueado a Docker Hub y a los hosts de MongoDB; no está en apt). Por ello quedan **pendientes de ejecución por el equipo en un entorno con MongoDB real**:
+  - `pnpm smoke:sprint2` completo (CRUD, préstamo/devolución, disponibilidad, métricas).
+  - `pnpm smoke:sprint1` completo.
+  - Flujo en navegador de extremo a extremo.
+
+### Riesgo abierto — S2-00 (DIFERIDO)
+
+- La rotación/purga de credenciales expuestas en el historial de Git **sigue diferida y sin resolver** (decisión del Scrum Master). Riesgo **abierto**.
+- Mientras S2-00 siga pendiente, el veredicto máximo del proyecto es **APROBADO CON OBSERVACIONES**.
+
+### Veredicto del Sprint 2
+
+**APROBADO CON OBSERVACIONES** — integración completa y verificada en todo lo que el entorno permite; observaciones: (1) S2-00 diferido; (2) smoke E2E con MongoDB y flujo en navegador pendientes de ejecución en entorno con MongoDB.

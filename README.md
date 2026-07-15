@@ -1,6 +1,7 @@
 # Biblioteca App
 
-Sistema de gestión bibliotecaria con arquitectura distribuida (monorepo pnpm). Entrega del **Sprint 1**.
+Sistema de gestión bibliotecaria con arquitectura distribuida (monorepo pnpm). Entrega del **Sprint 2**
+(CRUD de libros, préstamos/devoluciones, protección JWT y estadísticas iniciales sobre el incremento del Sprint 1).
 
 ## Estructura del monorepo
 
@@ -8,8 +9,8 @@ Sistema de gestión bibliotecaria con arquitectura distribuida (monorepo pnpm). 
 | --- | --- | --- | --- | --- |
 | `frontend/` | `gestor-biblioteca` | Interfaz web React + Vite + Tailwind + Zustand | 5173 | — |
 | `service-auth/` | `biblioteca-auth-service` | Registro, login y emisión de JWT | 4000 | PostgreSQL + Sequelize |
-| `service-library/` | `service-library` | Catálogo de libros (`GET /api/v1/books`) | 4001 | MongoDB + Mongoose |
-| `service-statistics/` | `service-statistics` | Resumen (`GET /api/v1/summary`), consume Library por HTTP | 4002 | — |
+| `service-library/` | `service-library` | Catálogo de libros + préstamos/devoluciones (Books, Loans, Returns) | 4001 | MongoDB + Mongoose |
+| `service-statistics/` | `service-statistics` | Resumen público + estadísticas protegidas, consume Library por HTTP | 4002 | — |
 
 Documentación: [docs/contracts.md](docs/contracts.md) (contratos congelados — fuente de verdad),
 [docs/sprint-1.md](docs/sprint-1.md) (alcance), [docs/handoff.md](docs/handoff.md) (estado real),
@@ -71,9 +72,11 @@ cp frontend/.env.example            frontend/.env
 | Servicio | Variables |
 | --- | --- |
 | Auth | `PORT`, `DATABASE_URL`, `JWT_SECRET`, `JWT_ISSUER`, `JWT_AUDIENCE`, `JWT_EXPIRES_IN`, `FRONTEND_URL`, `NODE_ENV` |
-| Library | `PORT`, `URI_MONGO`, `NODE_ENV` |
-| Statistics | `PORT`, `SERVICE_LIBRARY_URL`, `NODE_ENV` |
+| Library | `PORT`, `URI_MONGO`, `JWT_SECRET`, `JWT_ISSUER`, `JWT_AUDIENCE`, `NODE_ENV` |
+| Statistics | `PORT`, `SERVICE_LIBRARY_URL`, `JWT_SECRET`, `JWT_ISSUER`, `JWT_AUDIENCE`, `NODE_ENV` |
 | Frontend | `VITE_AUTH_API_URL`, `VITE_LIBRARY_API_URL`, `VITE_STATISTICS_API_URL` |
+
+> 🔐 **Sprint 2:** `JWT_SECRET`, `JWT_ISSUER` y `JWT_AUDIENCE` deben tener el **mismo valor** en Auth, Library y Statistics. Auth emite el JWT; Library y Statistics solo lo validan.
 
 > ⚠️ **Nunca subas secretos ni archivos `.env` al repositorio.** Solo se versionan los `.env.example` con valores de ejemplo.
 
@@ -139,15 +142,73 @@ Para poblar datos de prueba: `pnpm --filter service-library seed` (ver Fase de L
 curl http://localhost:4002/api/v1/summary
 ```
 
-### Smoke test automatizado
+### Seed de libros (opcional)
 
-Con los cuatro servicios activos:
+Para poblar datos de prueba en Library:
 
 ```bash
-pnpm smoke:sprint1
+pnpm --filter service-library seed
 ```
 
-Imprime PASS/FAIL por prueba y termina con código 0 si todo pasa.
+Es idempotente (no duplica en corridas sucesivas).
+
+### Smoke tests automatizados
+
+Con los cuatro servicios activos e infraestructura real (PostgreSQL + MongoDB):
+
+```bash
+pnpm smoke:sprint1   # incremento del Sprint 1 (health, auth, books, summary)
+pnpm smoke:sprint2   # flujo completo del Sprint 2 (22 comprobaciones)
+```
+
+Cada uno imprime PASS/FAIL por prueba y termina con código 0 si todo pasa.
+El smoke del Sprint 2 usa identificadores únicos y limpia sus datos de prueba.
+Para la comprobación 21 (Statistics `503` con Library apagado) define, de forma
+controlada, `SMOKE_STATS_LIBDOWN_URL` apuntando a una instancia de Statistics
+con un Library inalcanzable; en caso contrario esa comprobación se marca `SKIP`.
+
+## Rutas del Sprint 2
+
+### Library (4001)
+
+| Método | Ruta | Protección |
+| --- | --- | --- |
+| GET | `/api/v1/books` (filtros `?title=`, `?author=`, `?category=`) | Pública |
+| POST | `/api/v1/books` | JWT + `LIBRARIAN_ROLE` |
+| PUT | `/api/v1/books/:id` | JWT + `LIBRARIAN_ROLE` |
+| DELETE | `/api/v1/books/:id` (409 si tiene préstamo activo) | JWT + `LIBRARIAN_ROLE` |
+| GET | `/api/v1/loans` (filtro `?status=ACTIVE|RETURNED`) | JWT |
+| POST | `/api/v1/loans` | JWT + `LIBRARIAN_ROLE` |
+| POST | `/api/v1/returns` | JWT + `LIBRARIAN_ROLE` |
+
+### Statistics (4002)
+
+| Método | Ruta | Protección |
+| --- | --- | --- |
+| GET | `/api/v1/summary` | Pública |
+| GET | `/api/v1/statistics` | JWT |
+
+### Frontend (5173)
+
+| Ruta | Descripción |
+| --- | --- |
+| `/login`, `/register` | Autenticación |
+| `/app` | Resumen (estadísticas) |
+| `/app/books` | Gestión de libros |
+| `/app/loans` | Préstamos y devoluciones |
+
+## Flujo de demostración (Sprint 2)
+
+1. Iniciar sesión (o registrarse).
+2. Ir a **Libros** → crear un libro.
+3. Editarlo.
+4. Ir a **Préstamos** → registrar un préstamo del libro.
+5. Comprobar que el libro queda **no disponible**.
+6. Ir a **Resumen** → ver las estadísticas (préstamos activos aumenta).
+7. Registrar la **devolución** del préstamo.
+8. Comprobar que el libro vuelve a estar **disponible**.
+9. Eliminar el libro.
+10. Cerrar sesión.
 
 ## Reglas de trabajo
 
