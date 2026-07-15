@@ -1,0 +1,266 @@
+/* =========================================
+   GLOBAL EMAIL STYLES
+========================================= */
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #050505;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #ffffff;
+}
+
+.email-wrapper {
+  width: 100%;
+  padding: 40px 20px;
+  background: #050505;
+}
+
+.email-container {
+  max-width: 650px;
+  margin: auto;
+  background: linear-gradient(145deg, #0a0a0a, #111111);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 0 40px rgba(255, 255, 255, 0.05);
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.email-header {
+  padding: 45px 50px 20px;
+}
+
+.logo {
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: #ffffff;
+}
+
+.logo span {
+  color: #9ca3af;
+}
+
+.logo-line {
+  width: 90px;
+  height: 4px;
+  margin-top: 18px;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+/* =========================================
+   HERO
+========================================= */
+
+.email-hero {
+  padding: 10px 50px;
+}
+
+.email-title {
+  margin: 0;
+  font-size: 42px;
+  line-height: 1.15;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.email-subtitle {
+  margin-top: 18px;
+  color: #9ca3af;
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+/* =========================================
+   CONTENT CARD
+========================================= */
+
+.email-content {
+  padding: 20px 50px;
+}
+
+.content-card {
+  background: linear-gradient(145deg, #121212, #1a1a1a);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 24px;
+  padding: 35px;
+}
+
+.content-text {
+  color: #e5e7eb;
+  font-size: 16px;
+  line-height: 1.9;
+}
+
+.content-text p {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+/* =========================================
+   BUTTON
+========================================= */
+
+.email-button {
+  display: inline-block;
+  margin-top: 35px;
+  padding: 16px 30px;
+  background: #ffffff;
+  color: #000000 !important;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  border-radius: 14px;
+  transition: all 0.3s ease;
+}
+
+.email-button:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+/* =========================================
+   URL BOX
+========================================= */
+
+.url-box {
+  margin-top: 25px;
+  padding: 18px;
+  background: #0b0b0b;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 14px;
+  color: #9ca3af;
+  font-size: 13px;
+  word-break: break-all;
+}
+
+/* =========================================
+   CODE BOX (token de reset, para copiar/pegar en la app)
+   Nota: el correo no puede ejecutar JS, asi que no hay boton
+   "copiar" real; este bloque esta pensado para seleccionar el
+   texto a mano (tap-and-hold en movil, click-arrastrar en escritorio).
+========================================= */
+
+.code-box {
+  margin-top: 25px;
+  padding: 20px;
+  background: #0b0b0b;
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  text-align: center;
+}
+
+.code-box-label {
+  color: #9ca3af;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0 0 10px;
+}
+
+.code-box-value {
+  display: inline-block;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+  word-break: break-all;
+  user-select: all;
+}
+
+.code-box-hint {
+  margin: 12px 0 0;
+  color: #6b7280;
+  font-size: 11px;
+  line-height: 16px;
+}
+
+/* =========================================
+   ALERT BOX
+========================================= */
+
+.alert-box {
+  margin-top: 20px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.alert-box strong {
+  color: #ffffff;
+}
+
+.alert-box p {
+  margin-top: 10px;
+  color: #9ca3af;
+}
+
+/* =========================================
+   LIST
+========================================= */
+
+.feature-list {
+  color: #d1d5db;
+  line-height: 2;
+  padding-left: 18px;
+}
+
+/* =========================================
+   FOOTER
+========================================= */
+
+.email-footer {
+  padding: 10px 50px 50px;
+}
+
+.footer-divider {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 20px;
+  padding-top: 25px;
+}
+
+.footer-text {
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.8;
+  margin: 0;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media screen and (max-width: 700px) {
+  .email-container {
+    width: 100%;
+  }
+
+  .email-header,
+  .email-hero,
+  .email-content,
+  .email-footer {
+    padding-left: 25px;
+    padding-right: 25px;
+  }
+
+  .email-title {
+    font-size: 32px;
+  }
+
+  .content-card {
+    padding: 24px;
+  }
+
+  .email-button {
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+  }
+}
